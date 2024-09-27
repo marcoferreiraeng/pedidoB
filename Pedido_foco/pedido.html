@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queres namorar comigo?</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            transition: background-color 1s ease; /* Transição para o fundo escuro */
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative; /* Para o efeito de luz */
+            z-index: 1; /* Para garantir que a luz aparece acima do fundo escuro */
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #FF69B4;
+        }
+
+        .options {
+            margin-top: 30px;
+        }
+
+        label {
+            font-size: 1.5em;
+            margin-right: 20px;
+            color: #333;
+        }
+
+        input[type="checkbox"] {
+            width: 25px;
+            height: 25px;
+            accent-color: #FF69B4;
+            margin-right: 10px;
+        }
+
+        .submit-btn {
+            margin-top: 30px;
+            padding: 10px 30px;
+            font-size: 1.2em;
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #ff1493;
+        }
+
+        #imageContainer {
+            margin-top: 30px;
+            display: none;
+        }
+
+        #imageContainer img {
+            width: 500px;
+            height: auto;
+        }
+
+        /* Animação dos balões */
+        .balloon {
+            position: absolute;
+            bottom: 100%;
+            width: 50px;
+            height: 80px;
+            border-radius: 50%;
+            animation: float 7s ease-in-out forwards;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        /* Estilos para os corações */
+        .heart {
+            position: absolute;
+            bottom: 100%;
+            width: 80px;  
+            height: 80px; 
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: fallHearts 8s linear forwards;
+        }
+
+        @keyframes fallHearts {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        /* Estilos do fundo escuro */
+        .dark-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            transition: opacity 1s ease;
+            z-index: 0; /* Abaixo da caixa */
+        }
+
+        /* Estilos do feixe de luz */
+        .light-beam {
+            position: absolute;
+            top: 0;
+            right: 0; /* Posiciona o feixe de luz à direita */
+            width: 300px; /* Largura do feixe de luz */
+            height: 300px; /* Altura do feixe de luz */
+            background: radial-gradient(circle, rgba(215, 215, 201, 0.8) 20%, rgba(255, 255, 0, 0) 70%); /* Feixe amarelo */
+            opacity: 0;
+            transition: opacity 1s ease;
+            z-index: 2; /* Acima do fundo e da caixa */
+            transform: rotate(-45deg) translate(50%, 50%); /* Rotaciona e ajusta a posição do feixe */
+        }
+/* Estilos do fogo de artifício */
+.firework {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    pointer-events: none; /* Para evitar interação com os fogos de artifício */
+    animation: explode 10s forwards;
+}
+
+@keyframes explode {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(3);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+@keyframes fragment {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--x), var(--y));
+        opacity: 0;
+    }
+}
+
+
+
+
+
+
+
+    </style>
+</head>
+<body>
+
+    <div class="dark-overlay" id="darkOverlay"></div>
+    <div class="light-beam" id="lightBeam"></div>
+
+    <div class="container">
+        <h1>Queres namorar comigo?</h1>
+        <div class="options">
+            <label>
+                <input type="checkbox" id="sim"> Sim
+            </label>
+            <label>
+                <input type="checkbox" id="claro"> Claro que sim
+            </label>
+        </div>
+        <button class="submit-btn" onclick="mostrarImagem()">Confirmar</button>
+        <div id="imageContainer">
+            <img src="aBsolute_cinema1.png" alt="Imagem Personalizada">
+        </div>
+    </div>
+
+    <div id="balloonContainer"></div>
+
+    <script>
+        let heartCount = 0;
+
+        function mostrarImagem() {
+            var claro = document.getElementById('claro').checked;
+
+            if (claro) {
+                document.getElementById('imageContainer').style.display = "block";
+                soltarBaloes();  
+                
+                setTimeout(soltarCoracoes, 5000);
+                setTimeout(soltarRealHearts, 5000);
+                setTimeout(ativarEfeitosFinais, 16000); // Ativa os efeitos finais após 16s
+                setTimeout(ativarEfeitosFinais, 16000); // Ativa os efeitos finais após 16s
+                setTimeout(ativarFogosDeArtificio, 18000); // Adiciona fogos de artifício após 18s
+
+            } else {
+                alert("Tens que escolher a opção 'Claro que sim'! 😊");
+            }
+        }
+
+        function soltarBaloes() {
+            var container = document.getElementById('balloonContainer');
+            container.innerHTML = '';
+            const balloonColors = ['#FF69B4', '#FFD700', '#00BFFF', '#ADFF2F', '#FF4500', '#9400D3'];
+
+            for (let i = 0; i < 20; i++) {
+                let baloon = document.createElement('div');
+                baloon.classList.add('balloon');
+                baloon.style.backgroundColor = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+                baloon.style.left = Math.random() * 100 + '%';
+                baloon.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(baloon);
+            }
+
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function soltarCoracoes() {
+            var container = document.getElementById('balloonContainer');
+            heartCount = 0;
+
+            function createHeart() {
+                if (heartCount < 100) {
+                    let heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    heart.style.backgroundImage = "url('hearts.jpeg')";
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.animationDelay = Math.random() * 2 + 's';
+                    container.appendChild(heart);
+                    heartCount++;
+
+                    heart.addEventListener('animationend', () => {
+                        heart.remove();
+                        heartCount--;
+                    });
+                }
+            }
+
+            let interval = setInterval(createHeart, 500); 
+            setTimeout(() => clearInterval(interval), 15000);
+        }
+
+        function soltarRealHearts() {
+            var container = document.getElementById('balloonContainer');
+
+            function createRealHeart() {
+                let realHeart = document.createElement('div');
+                realHeart.classList.add('heart');
+                realHeart.style.backgroundImage = "url('real_hearts.jpeg')";
+                realHeart.style.left = Math.random() * 100 + '%';
+                realHeart.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(realHeart);
+
+                realHeart.addEventListener('animationend', () => {
+                    realHeart.remove();
+                });
+            }
+
+            let interval = setInterval(createRealHeart, 500); 
+            setTimeout(() => clearInterval(interval), 15000);
+        }
+
+        function ativarEfeitosFinais() {
+            // Apaga o fundo e ativa o feixe de luz
+            document.getElementById('darkOverlay').style.opacity = 1;
+            document.getElementById('lightBeam').style.opacity = 1;
+        }
+
+
+        function ativarFogosDeArtificio() {
+    const container = document.getElementById('balloonContainer');
+    const colors = ['#FFFF00', '#FFA500', '#FFFFFF', '#808080']; // Amarelo, Laranja, Branco e Cinza
+
+    function criarExplosao() {
+        for (let i = 0; i < 100; i++) { // Criar 100 fogos de artifício
+            let firework = document.createElement('div');
+            firework.classList.add('firework');
+            firework.style.left = Math.random() * 100 + '%';
+            firework.style.bottom = Math.random() * 100 + 'vh';
+            firework.style.background = colors[Math.floor(Math.random() * colors.length)];
+            firework.style.animation = `explode 1s forwards`;
+
+            container.appendChild(firework);
+
+            // Criação dos fragmentos após a explosão
+            firework.addEventListener('animationend', () => {
+                for (let j = 0; j < 20; j++) { // 20 fragmentos por explosão
+                    let fragment = document.createElement('div');
+                    fragment.classList.add('firework');
+                    fragment.style.background = firework.style.background;
+                    fragment.style.width = '5px';
+                    fragment.style.height = '5px';
+                    fragment.style.position = 'absolute';
+                    fragment.style.left = firework.style.left;
+                    fragment.style.bottom = firework.style.bottom;
+
+                    // Direção aleatória para cada fragmento
+                    let angle = Math.random() * 2 * Math.PI;
+                    let distance = Math.random() * 100 + 50;
+                    fragment.style.setProperty('--x', `${Math.cos(angle) * distance}px`);
+                    fragment.style.setProperty('--y', `${Math.sin(angle) * distance}px`);
+
+                    fragment.style.animation = `fragment 1s forwards`;
+
+                    container.appendChild(fragment);
+
+                    fragment.addEventListener('animationend', () => {
+                        fragment.remove();
+                    });
+                }
+
+                firework.remove();
+            });
+        }
+    }
+
+    // Executa 5 explosões com intervalo de 2s após a queda dos corações
+    let interval = 2000; // 2 segundos
+    for (let k = 0; k < 5; k++) {
+        setTimeout(criarExplosao, k * interval);
+    }
+}
+
+
+function soltarCoracoes() {
+    var container = document.getElementById('balloonContainer');
+    heartCount = 0;
+
+    function createHeart() {
+        if (heartCount < 100) { // Mantém a contagem de corações
+            let heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.style.backgroundImage = "url('hearts.jpeg')";
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDelay = Math.random() * 2 + 's';
+            container.appendChild(heart);
+            heartCount++;
+
+            heart.addEventListener('animationend', () => {
+                heart.remove();
+                heartCount--;
+            });
+        }
+    }
+
+    let interval = setInterval(createHeart, 500); 
+    setTimeout(() => {
+        clearInterval(interval);
+        setTimeout(soltarRealHearts, 500); // Chama a função soltarRealHearts após 500ms
+    }, 15000);
+}
+
+function soltarRealHearts() {
+    var container = document.getElementById('balloonContainer');
+
+    function createRealHeart() {
+        let realHeart = document.createElement('div');
+        realHeart.classList.add('heart');
+        realHeart.style.backgroundImage = "url('real_hearts.jpeg')";
+        realHeart.style.left = Math.random() * 100 + '%';
+        realHeart.style.animationDelay = Math.random() * 2 + 's';
+        container.appendChild(realHeart);
+
+        realHeart.addEventListener('animationend', () => {
+            realHeart.remove();
+        });
+    }
+
+    let interval = setInterval(createRealHeart, 500); 
+    setTimeout(() => {
+        clearInterval(interval);
+        ativarFogosDeArtificio(); // Chama a função de fogos de artifício após soltar os corações reais
+    }, 15000);
+}
+
+
+
+
+
+
+    </script>
+
+</body>
+</html>
